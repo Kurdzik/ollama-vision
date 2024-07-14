@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi import UploadFile
 import os
-from io import BytesIO
 from ollama import Client
 
 app = FastAPI()
+
 
 @app.post("/upload")
 async def upload_image(image: UploadFile):
@@ -21,10 +21,13 @@ async def upload_image(image: UploadFile):
 
 
 @app.get("/ask")
-async def analyze_image(prompt: str, img_path):
+async def analyze_image(prompt: str, img_path, model: str = "llava:7b"):
     ollama_client = Client(host='http://ollama:11434')
+
+    ollama_client.pull(model)
+
     res = ollama_client.chat(
-        model="llava:7b",
+        model=model,
         messages=[
             {
                 'role': 'user',
